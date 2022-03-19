@@ -10,7 +10,7 @@
 # The above one-liner can be included in a CI/CD pipeline project.
 
 ARCH                := $$(uname -m)
-NAME                := colorkeys
+NAME                := chiral
 HASHLONG            := $$(git log -1 --pretty=%H --no-merges)
 HASHSHORT           := $$(git log -1 --pretty=%h --no-merges)
 TAG                 := $$(git describe --tags --abbrev=0)
