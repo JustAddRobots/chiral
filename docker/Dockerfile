@@ -16,6 +16,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
 	sudo \
 	&& dnf clean all && rm -rf /var/cache/dnf \
 	&& ssh-keygen -t rsa -b 4096 -N '' -f ~/.ssh/id_rsa \
-	&& echo docker | passwd root --stdin
+	&& ssh-keygen -A \
+	&& echo docker | passwd root --stdin 
 
 CMD ["/usr/sbin/sshd", "-D"] && /usr/bin/bash

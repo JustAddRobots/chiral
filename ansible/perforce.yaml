@@ -1,0 +1,8 @@
+---
+- hosts: perforce
+  become: true
+  roles:
+    - hostnamctl
+    - avahi
+    - useradd
+    - nginx

@@ -1,0 +1,35 @@
+---
+- name: Starting HelixCore docker
+  docker_container:
+    name: helixcore
+    image: chiral:0.2.0-dev.0-x86_64
+    state: started
+    interactive: yes
+    tty: yes
+    mac_address: 02:42:ac:11:00:22
+    published_ports:
+      - "2022:22"
+      - "80:80"
+      - "443:443"
+    capabilities:
+      - net_admin
+  register: x
+  vars:
+    ansible_python_interpreter: /usr/local/Caskroom/miniconda/base/envs/chiral-py392/bin/python3
+
+- name: Add dhclient
+  dnf:
+    name:
+      - dhcp-client
+  vars:
+    ansible_python_interpreter: /usr/local/Caskroom/miniconda/base/envs/chiral-py392/bin/python3
+
+- name: Start dhclient
+  command:
+    cmd: dhclient -r
+  vars:
+    ansible_python_interpreter: /usr/local/Caskroom/miniconda/base/envs/chiral-py392/bin/python3
+
+- name: Logger
+  debug:
+    var: x.container.NetworkSettings.IPAddress
