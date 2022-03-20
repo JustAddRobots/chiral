@@ -6,9 +6,9 @@ ENV TZ=America/Los_Angeles
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone \
-    && PERFORCE_GPGKEY_SUM=a0016d881d3a528e0651265743565448b9c6dea2828f654358d9348d5f5b6d98 \
+    && PERFORCE_GPGKEY_SUM=cfd3de702b06cdc904fb17604767d6c484bfc54d7befef23a669a641816d42bd \
     && curl -fsSL https://package.perforce.com/perforce.pubkey | sed '/^Version/d' > /etc/pki/rpm-gpg/RPM-GPG-KEY-PERFORCE \
-    # && echo "$PERFORCE_GPGKEY_SUM  /etc/pki/rpm-gpg/RPM-GPG-KEY-PERFORCE" | sha256sum -c --strict - \
+    && echo "$PERFORCE_GPGKEY_SUM  /etc/pki/rpm-gpg/RPM-GPG-KEY-PERFORCE" | sha256sum -c --strict - \
     && dnf -y install \
 	helix-p4d \
 	openssh-server \
