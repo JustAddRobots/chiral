@@ -2,9 +2,7 @@
 perforce:
     hosts:
       chiral:
-        ansible_host: 11.22.33.22
-    vars:
-      sudo_user: root
+        ansible_host: localhost
 
 local:
     hosts: localhost

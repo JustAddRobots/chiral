@@ -11,12 +11,18 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo "$PERFORCE_GPGKEY_SUM  /etc/pki/rpm-gpg/RPM-GPG-KEY-PERFORCE" | sha256sum -c --strict - \
     && dnf -y install \
 	helix-p4d \
+	iproute \
+	man \
+	mlocate \
 	openssh-server \
 	passwd \
+	procps \
+	procps-ng \
 	sudo \
+	vim \
 	&& dnf clean all && rm -rf /var/cache/dnf \
 	&& ssh-keygen -t rsa -b 4096 -N '' -f ~/.ssh/id_rsa \
 	&& ssh-keygen -A \
 	&& echo docker | passwd root --stdin 
 
-CMD ["/usr/sbin/sshd", "-D"] && /usr/bin/bash
+CMD /usr/sbin/sshd ; /usr/bin/bash

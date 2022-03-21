@@ -6,30 +6,22 @@
     state: started
     interactive: yes
     tty: yes
-    mac_address: 02:42:ac:11:00:22
     published_ports:
-      - "2022:22"
-      - "80:80"
-      - "443:443"
-    capabilities:
-      - net_admin
+      - "2222:22"
+      - "8080:80"
+      - "4433:443"
   register: x
-  vars:
-    ansible_python_interpreter: /usr/local/Caskroom/miniconda/base/envs/chiral-py392/bin/python3
-
-- name: Add dhclient
-  dnf:
-    name:
-      - dhcp-client
-  vars:
-    ansible_python_interpreter: /usr/local/Caskroom/miniconda/base/envs/chiral-py392/bin/python3
-
-- name: Start dhclient
-  command:
-    cmd: dhclient -r
   vars:
     ansible_python_interpreter: /usr/local/Caskroom/miniconda/base/envs/chiral-py392/bin/python3
 
 - name: Logger
   debug:
     var: x.container.NetworkSettings.IPAddress
+
+# - name: Update Container IP address in hosts.yaml
+#   lineinfile:
+#     path: "{{ playbook_dir }}/hosts.yaml"
+#     regexp: '^(\s*)ansible_host: 11.22.33.XXX'
+#     line: '\1ansible_host: {{ x.container.NetworkSettings.IPAddress }}'
+#     state: present
+#     backrefs: yes
