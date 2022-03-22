@@ -12,8 +12,13 @@
       dest: /etc/nginx/nginx.conf
       src: templates/nginx.conf.j2
 
+- name: Check if nginx is running
+  shell: ps -ef | grep "/usr/sbin/nginx" | grep -v grep
+  ignore_errors: yes
+  changed_when: false
+  register: nginx_status
+
 - name: Start Nginx
-  systemd:
-    enabled: yes
-    name: nginx
-    state: started
+  command:
+    cmd: /usr/sbin/nginx
+  when: nginx_status.rc == 1

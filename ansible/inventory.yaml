@@ -1,0 +1,30 @@
+---
+all:
+  vars:
+    host_port_ssh: 2222
+    host_port_http: 8080
+    host_port_https: 443
+    local_sudo_user: rcon
+    container_sudo_user: rcon
+    container_sudo_user_passwd: $6$I/pkkzR8RcJjgdxJ$AskdsANFCz9pu5MmPsPihCTyAyWTEgh6w4WkZJhgsKftxiSDyg93pvTW4VlldHQt.eRpZ0q66rJHD6To4qece0
+    host_env_python: /usr/local/Caskroom/miniconda/base/envs/chiral-py392/bin/python3
+    host_p4_bind_mnt_root: /Volumes/RAVAGE/data/Perforce
+    p4root: /opt/perforce/data
+    p4port: 1666
+    perforce_root_user: perforce
+    perforce_root_user_passwd:
+  children:
+    perforce:
+        hosts:
+          localhost:
+            ansible_host: localhost
+        vars:
+          ansible_user: root
+          ansible_become_user: root
+          ansible_ssh_port: "{{ host_port_ssh }}"
+    local:
+        hosts:
+          localhost:
+            ansible_host: localhost
+        vars:
+          sudo_user: "{{ local_sudo_user }}"

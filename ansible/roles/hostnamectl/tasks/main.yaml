@@ -1,3 +1,0 @@
----
-- name: Set hostname
-  shell: hostnamectl set-hostname "{{ inventory_hostname }}".local

@@ -1,2 +1,2 @@
 ---
-sudo_user: rcon
+sudo_user: "{{ sudo_user }}"

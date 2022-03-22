@@ -1,7 +1,20 @@
 ---
-- name: Add user rcon
+- name: Add sudo user
   user:
     generate_ssh_key: yes
+    ssh_key_bits: 2048
     groups: wheel
-    name: "{{ sudo_user }}"
-    password: $6$I/pkkzR8RcJjgdxJ$AskdsANFCz9pu5MmPsPihCTyAyWTEgh6w4WkZJhgsKftxiSDyg93pvTW4VlldHQt.eRpZ0q66rJHD6To4qece0
+    name: "{{ container_sudo_user }}"
+    password: "{{ container_sudo_user_passwd }}"
+    shell: /usr/bin/bash
+
+- name: Add authorized_key to sudo user
+  authorized_key:
+    user: "{{ container_sudo_user }}" 
+    state: present
+    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+- name: Remove /var/run/nologin
+  file:
+    path: /var/run/nologin
+    state: absent

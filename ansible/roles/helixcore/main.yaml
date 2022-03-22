@@ -1,0 +1,11 @@
+---
+- name: 
+
+sudo
+main -n -p "{{ p4port }}" -r "{{ p4root }}" -u "{{ perforce_root_user }}" -P "{{ perforce_root_user_passwd }}" --unicode --case 0
+
+P4ROOT
+P4PORT
+P4SSLDIR
+certificate.txt
+privatekey.txt

@@ -18,11 +18,14 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
 	passwd \
 	procps \
 	procps-ng \
+	python3 \
 	sudo \
 	vim \
 	&& dnf clean all && rm -rf /var/cache/dnf \
 	&& ssh-keygen -t rsa -b 4096 -N '' -f ~/.ssh/id_rsa \
 	&& ssh-keygen -A \
 	&& echo docker | passwd root --stdin 
+
+COPY ./authorized_keys /root/.ssh/authorized_keys
 
 CMD /usr/sbin/sshd ; /usr/bin/bash
