@@ -1,4 +1,12 @@
 ---
+- name: Create new Perfore bind mount dirs
+  file:
+    state: dir
+    path: "{{ item }}"
+  with_items:
+      - "{{ host_p4_bind_mnt_root }}/perforce-data"
+      - "{{ host_p4_bind_mnt_root }}/dbs"
+
 - name: Starting chiral docker
   docker_container:
     hostname: chiral
@@ -12,8 +20,12 @@
       - "{{ host_port_http }}:80"
       - "{{ host_port_https }}:443"
     volumes:
-      - "{{ host_p4_bin_mnt_root }}"/perforce-data:/opt/perforce/perforce-data
-      - "{{ host_p4_bin_mnt_root }}"/dbs:/opt/perforce/dbs
+      - "{{ host_p4_bind_mnt_root }}/perforce-data:/opt/perforce/perforce-data"
+      - "{{ host_p4_bind_mnt_root }}/dbs:/opt/perforce/dbs"
+    env:
+      - P4ROOT: "{{ p4root }}"
+      - P4PORT: "{{ p4port }}"
+      - P4USER: "{{ perforce_root_user }}"
   register: x
   vars:
     ansible_python_interpreter: "{{ host_env_python }}"

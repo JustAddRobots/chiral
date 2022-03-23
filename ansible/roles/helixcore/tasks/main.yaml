@@ -1,0 +1,8 @@
+---
+- name: Configure Helix Core service
+  command:
+    cmd: "/opt/perforce/sbin/configure-helix-p4d.sh {{ perforce_service_name }}  -n -p {{ p4port }} -r {{ p4root }} -u {{ perforce_root_user }} -P {{ perforce_root_user_passwd }} --unicode --case 0"
+    
+#P4SSLDIR
+#certificate.txt
+#privatekey.txt
