@@ -32,3 +32,6 @@ push:
 default:
 	@docker tag ${IMGLONG} ${DEFAULT}
 	@docker push ${DEFAULT}
+
+up:
+	@docker-compose up

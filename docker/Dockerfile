@@ -1,8 +1,12 @@
 FROM rockylinux:8.5
 
 WORKDIR /
-COPY ./repofile/* /etc/yum.repos.d
+COPY ./repofile/* /etc/yum.repos.d/
 ENV TZ=America/Los_Angeles
+ENV P4PORT=ssl:1666
+ENV P4ROOT=/opt/perforce/perforce-data
+ENV P4USER=perforce
+ENV P4SSLDIR=/opt/perforce/tls
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone \
@@ -14,18 +18,43 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
 	iproute \
 	man \
 	mlocate \
+	nginx \
+	openssh-clients \
 	openssh-server \
 	passwd \
 	procps \
-	procps-ng \
 	python3 \
 	sudo \
+	tree \
 	vim \
 	&& dnf clean all && rm -rf /var/cache/dnf \
-	&& ssh-keygen -t rsa -b 4096 -N '' -f ~/.ssh/id_rsa \
-	&& ssh-keygen -A \
-	&& echo docker | passwd root --stdin 
+	&& ssh-keygen -t rsa -b 4096 -N '' -f ~/.ssh/id_rsa && ssh-keygen -A \
+	&& echo docker | passwd root --stdin \
+	&& useradd rcon && echo password | passwd rcon --stdin \
+	&& usermod -a -G wheel rcon \
+	&& mkdir /home/rcon/.ssh \
+	&& ssh-keygen -t rsa -b 4096 -N '' -f /home/rcon/.ssh/id_rsa \
+	&& python3 -m pip install --upgrade pip \
+	&& rm -f /var/run/nologin 
 
+COPY ./tls/privatekey.txt /etc/pki/tls/private/
+COPY ./tls/certificate.txt /etc/pki/tls/certs/
+COPY ./tls/privatekey.txt /opt/perforce/tls/
+COPY ./tls/certificate.txt /opt/perforce/tls/
+COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY ./authorized_keys /root/.ssh/authorized_keys
+COPY ./authorized_keys /home/rcon/.ssh/authorized_keys
 
-CMD /usr/sbin/sshd ; /usr/bin/bash
+RUN echo "P4PORT: $P4PORT" \
+	&& echo "P4ROOT: $P4ROOT" \
+	&& echo "P4USER: $P4USER" \
+	&& echo "P4SSLDIR: $P4SSLDIR" \
+	&& chown -R perforce:perforce $P4SSLDIR \
+	&& chmod 700 $P4SSLDIR \
+	&& chmod 600 $P4SSLDIR/* \
+	&& chmod 600 /home/rcon/.ssh/authorized_keys \
+	&& chown -R rcon:rcon /home/rcon/.ssh \
+	&& /opt/perforce/sbin/configure-helix-p4d.sh main -n -p $P4PORT -r $P4ROOT -u $P4USER -P j_f7WeXjk7fCBpyL.NpX --unicode --case 0 \
+	&& sudo -u perforce P4SSLDIR=$P4SSLDIR p4d -Gf > /opt/perforce/tls/signature.txt
+
+CMD /usr/sbin/sshd ; /usr/sbin/nginx ; sudo -u perforce p4dctl start main ; /usr/bin/bash
