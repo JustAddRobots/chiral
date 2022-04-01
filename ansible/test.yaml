@@ -1,5 +1,0 @@
----
-- hosts: perforce
-  become: true
-  roles:
-    - helixcore
