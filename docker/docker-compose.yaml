@@ -1,20 +1,18 @@
 version: '3'
 services:
   p4:
+    image: ${IMG}
     build: 
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
     tty: true
     volumes:
-      - /Volumes/RAVAGE/data/Perforce/perforce-data:/opt/perforce/perforce-data
-      - /Volumes/RAVAGE/data/Perforce/dbs:/opt/perforce/dbs
-      - /Volumes/RAVAGE/data/Perforce/p4dctl.conf.d:/etc/perforce/p4dctl.conf.d
-    environment:
-      - P4PORT=ssl:1666
-      - P4ROOT=/opt/perforce/perforce-data
-      - P4USER=perforce
-      - P4SSLDIR=/opt/perforce/tls
+      - ${P4_BIND_ROOT}/perforce-data:/opt/perforce/perforce-data
+      - ${P4_BIND_ROOT}/dbs:/opt/perforce/dbs
+      - ${P4_BIND_ROOT}/p4dctl.conf.d:/etc/perforce/p4dctl.conf.d
+    env_file:
+      - .env
     ports:
       - "2222:22"
       - "8080:80"

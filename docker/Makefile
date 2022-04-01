@@ -1,16 +1,14 @@
 # NEEDS INTEGRATION INTO SERVERLESS AWS
 
-# This Makefile automatically builds the docker container and pushes
-# the resulting image to the specified server.
-#
+# This Makefile automatically builds the docker container.
 # To run from the package top-level:
 #
-# $ sudo make -C docker build push
+# $ sudo make -C docker build
 #
 # The above one-liner can be included in a CI/CD pipeline project.
 
-ARCH                := $$(uname -m)
 NAME                := chiral
+ARCH                := $$(uname -m)
 HASHLONG            := $$(git log -1 --pretty=%H --no-merges)
 HASHSHORT           := $$(git log -1 --pretty=%h --no-merges)
 TAG                 := $$(git describe --tags --abbrev=0)
@@ -19,19 +17,18 @@ IMGSHORT            := ${NAME}:${TAG}-${ARCH}
 DEFAULT             := ${NAME}:default-${ARCH}
 
 .PHONY: all
-all: build push
+all: reup
 
 build:
-	@docker build --no-cache -t ${IMGLONG} --build-arg GIT_COMMIT=${HASHSHORT} .
+	@IMG=${IMGLONG} docker-compose build --no-cache
 	@docker tag ${IMGLONG} ${IMGSHORT}
 
-push:
-	@docker push ${IMGLONG}
-	@docker push ${IMGSHORT}
-
-default:
-	@docker tag ${IMGLONG} ${DEFAULT}
-	@docker push ${DEFAULT}
+reup:
+	@COMPOSE_PROJECT_NAME=${NAME} IMG=${IMGLONG} docker-compose up --build --detach
+	@docker tag ${IMGLONG} ${IMGSHORT}
 
 up:
-	@docker-compose up
+	@COMPOSE_PROJECT_NAME=${NAME} IMG=${IMGLONG} docker-compose up --detach
+
+down:
+	@COMPOSE_PROJECT_NAME=${NAME} docker-compose down

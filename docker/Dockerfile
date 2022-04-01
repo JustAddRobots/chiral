@@ -6,6 +6,7 @@ ENV TZ=America/Los_Angeles
 ENV P4PORT=ssl:1666
 ENV P4ROOT=/opt/perforce/perforce-data
 ENV P4USER=perforce
+ENV P4PASSWD=j_f7WeXjk7fCBpyL.NpX
 ENV P4SSLDIR=/opt/perforce/tls
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
@@ -15,15 +16,12 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo "$PERFORCE_GPGKEY_SUM  /etc/pki/rpm-gpg/RPM-GPG-KEY-PERFORCE" | sha256sum -c --strict - \
     && dnf -y install \
 	helix-p4d \
-	iproute \
-	man \
 	mlocate \
 	nginx \
 	openssh-clients \
 	openssh-server \
 	passwd \
 	procps \
-	python3 \
 	sudo \
 	tree \
 	vim \
@@ -34,16 +32,17 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
 	&& usermod -a -G wheel rcon \
 	&& mkdir /home/rcon/.ssh \
 	&& ssh-keygen -t rsa -b 4096 -N '' -f /home/rcon/.ssh/id_rsa \
-	&& python3 -m pip install --upgrade pip \
 	&& rm -f /var/run/nologin 
 
 COPY ./tls/privatekey.txt /etc/pki/tls/private/
 COPY ./tls/certificate.txt /etc/pki/tls/certs/
 COPY ./tls/privatekey.txt /opt/perforce/tls/
 COPY ./tls/certificate.txt /opt/perforce/tls/
-COPY ./nginx.conf /etc/nginx/nginx.conf
-COPY ./authorized_keys /root/.ssh/authorized_keys
-COPY ./authorized_keys /home/rcon/.ssh/authorized_keys
+COPY ./tls/authorized_keys /root/.ssh/authorized_keys
+COPY ./tls/authorized_keys /home/rcon/.ssh/authorized_keys
+COPY ./conf/nginx.conf /etc/nginx/nginx.conf
+COPY ./conf/setenv.sh /etc/profile.d/
+COPY ./conf/typemap_ue4.txt /usr/local/tmp/
 
 RUN echo "P4PORT: $P4PORT" \
 	&& echo "P4ROOT: $P4ROOT" \
@@ -52,9 +51,10 @@ RUN echo "P4PORT: $P4PORT" \
 	&& chown -R perforce:perforce $P4SSLDIR \
 	&& chmod 700 $P4SSLDIR \
 	&& chmod 600 $P4SSLDIR/* \
+	&& chmod 600 /root/.ssh/authorized_keys \
 	&& chmod 600 /home/rcon/.ssh/authorized_keys \
 	&& chown -R rcon:rcon /home/rcon/.ssh \
-	&& /opt/perforce/sbin/configure-helix-p4d.sh main -n -p $P4PORT -r $P4ROOT -u $P4USER -P j_f7WeXjk7fCBpyL.NpX --unicode --case 0 \
+	&& /opt/perforce/sbin/configure-helix-p4d.sh main -n -p $P4PORT -r $P4ROOT -u $P4USER -P $P4USER_PASSWD --unicode --case 0 \
 	&& sudo -u perforce P4SSLDIR=$P4SSLDIR p4d -Gf > /opt/perforce/tls/signature.txt
 
 CMD /usr/sbin/sshd ; /usr/sbin/nginx ; sudo -u perforce p4dctl start main ; /usr/bin/bash
