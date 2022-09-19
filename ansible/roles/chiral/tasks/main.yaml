@@ -1,0 +1,56 @@
+---
+- name: Create stat items
+  stat:
+    path: "{{ item }}"
+  register: stat_results
+  with_items:
+      - "{{ host_p4_bind_mnt_root }}/perforce-data"
+      - "{{ host_p4_bind_mnt_root }}/dbs"
+      - "{{ host_p4_etc }}/p4dctl.conf.d"
+
+- name: Create new Perforce bind mount dirs
+  file:
+    state: directory
+    path: "{{ item.item }}.{{ timestamp }}"
+    owner: rcon
+    group: staff
+    mode: 0755
+  when: item.stat.exists == False
+  with_items: "{{ stat_results.results }}"
+
+- name: Create symlink for bind mount dirs
+  file:
+    state: link
+    src: "{{ item.item }}.{{ timestamp }}"
+    dest: "{{ item.item }}"
+  when: item.stat.exists == False
+  with_items: "{{ stat_results.results }}"
+
+- name: Starting chiral docker
+  docker_container:
+    hostname: chiral
+    name: chiral
+    image: chiral:0.2.0-dev.0-x86_64
+    state: started
+    interactive: yes
+    tty: yes
+    published_ports:
+      - "{{ host_port_ssh }}:22"
+      - "{{ host_port_http }}:80"
+      - "{{ host_port_https }}:443"
+      - "{{ p4port }}:1666"
+    volumes:
+      - "{{ host_p4_bind_mnt_root }}/perforce-data:/opt/perforce/perforce-data"
+      - "{{ host_p4_bind_mnt_root }}/dbs:/opt/perforce/dbs"
+    env:
+      P4ROOT: "{{ p4root }}"
+      P4PORT: "{{ p4port }}"
+      P4USER: "{{ perforce_root_user }}"
+      P4SSLDIR: "{{ p4ssldir }}"
+  register: x
+  vars:
+    ansible_python_interpreter: "{{ host_env_python }}"
+
+- name: Logger
+  debug:
+    var: x.container.NetworkSettings.IPAddress

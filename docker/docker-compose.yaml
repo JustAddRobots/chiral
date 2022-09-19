@@ -1,0 +1,20 @@
+version: '3'
+services:
+  p4:
+    image: ${IMG}
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ${P4_BIND_ROOT}/perforce-data:/opt/perforce/perforce-data
+      - ${P4_BIND_ROOT}/dbs:/opt/perforce/dbs
+      - ${P4_BIND_ROOT}/p4dctl.conf.d:/etc/perforce/p4dctl.conf.d
+    env_file:
+      - .env
+    ports:
+      - "2222:22"
+      - "8080:80"
+      - "443:443"
+      - "1666:1666"

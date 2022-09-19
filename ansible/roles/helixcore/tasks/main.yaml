@@ -1,0 +1,51 @@
+---
+- name: Create perforce TLS dir
+  file:
+    path: "{{ p4ssldir }}"
+    state: directory
+    owner: "{{ perforce_root_user }}"
+    group: "{{ perforce_root_user }}"
+    mode: 0700
+
+- name: Copy TLS key
+  copy:
+    src: "{{ tls_private_key_file }}"
+    dest: "{{ p4sslkey }}"
+    owner: "{{ perforce_root_user }}"
+    group: "{{ perforce_root_user }}"
+    mode: 0600
+
+- name: Copy TLS cert
+  copy:
+    src: "{{ tls_crt_file }}"
+    dest: "{{ p4sslcert }}"
+    owner: "{{ perforce_root_user }}"
+    group: "{{ perforce_root_user }}"
+    mode: 0600
+
+- name: Generate TLS signature
+  command:
+  become: true
+  become_user: "{{ perforce_root_user }}"
+    cmd: "sudo -u {{ perforce_root_user }} P4SSLDIR={{ p4ssldir }} p4d -Gf"
+  register: sig
+
+- name: Check if Helix Core is running
+  shell: ps -ef | grep "p4d" | grep -v grep
+  ignore_errors: yes
+  changed_when: false
+  register: p4d_status
+
+- name: Start Helix Core
+  command:
+    cmd: "/opt/perforce/sbin/configure-helix-p4d.sh {{ perforce_service_name }}  -n -p {{ p4port }} -r {{ p4root }} -u {{ perforce_root_user }} -P {{ perforce_root_user_passwd }} --unicode --case 0"
+  environment:
+    P4PORT: "{{ p4port }}"
+    P4ROOT: "{{ p4root }}"
+    P4USER: "{{ perforce_root_user }}"
+    P4SSLDIR: "{{ p4ssldir }}"
+  when: p4d_status.rc == 1
+
+- name: Logger
+  debug:
+    var: sig.stdout

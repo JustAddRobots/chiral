@@ -1,0 +1,20 @@
+---
+- name: Add sudo user
+  user:
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    groups: wheel
+    name: "{{ container_sudo_user }}"
+    password: "{{ container_sudo_user_passwd }}"
+    shell: /usr/bin/bash
+
+- name: Add authorized_key to sudo user
+  authorized_key:
+    user: "{{ container_sudo_user }}" 
+    state: present
+    key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+- name: Remove /var/run/nologin
+  file:
+    path: /var/run/nologin
+    state: absent

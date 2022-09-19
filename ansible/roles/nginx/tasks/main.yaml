@@ -1,0 +1,24 @@
+---
+- name: Install nginx
+  dnf:
+    name:
+      - nginx
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+- name: Template nginx.conf
+  ansible.builtin.template:
+      backup: true
+      dest: /etc/nginx/nginx.conf
+      src: templates/nginx.conf.j2
+
+- name: Check if nginx is running
+  shell: ps -ef | grep "/usr/sbin/nginx" | grep -v grep
+  ignore_errors: yes
+  changed_when: false
+  register: nginx_status
+
+- name: Start Nginx
+  command:
+    cmd: /usr/sbin/nginx
+  when: nginx_status.rc == 1

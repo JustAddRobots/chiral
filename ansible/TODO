@@ -1,0 +1,6 @@
+remove ansible docker_container bits
+P4USER, P4PASSWD
+p4 trust
+cat /etc/perforce/p4dctl.conf.d/typemap_ue4.txt | p4 typemap -i
+cat /tmp/p4_user_rcon.txt | p4 user -i -f
+p4 passwd rcon

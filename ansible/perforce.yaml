@@ -1,0 +1,6 @@
+---
+- hosts: perforce
+  become: true
+  roles:
+    - useradd
+    - nginx

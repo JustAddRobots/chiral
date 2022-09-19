@@ -1,0 +1,34 @@
+# https://unrealcommunity.wiki/perforce-and-unreal-dsbokw3p
+
+TypeMap:
+binary+l //....bmp
+binary+l //....fbx
+binary+l //....mp4
+binary+l //....png
+binary+l //....svg
+binary+l //....uasset
+binary+l //....umap
+binary+l //....wmv
+binary+w //....app
+binary+w //....dll
+binary+w //....dylib
+binary+w //....exe
+binary+w //....lib
+binary+w //....ipa
+binary+w //....stub
+binary+Sw //....pdb
+text //....c
+text //....config
+text //....cpp
+text //....cs
+text //....ini
+text //....json
+text //....h
+text //....m
+text //....mm
+text //....py
+text+w //....DotSettings
+text+w //....modules
+text+w //....target
+text+w //....uatbuildrecord
+text+w //....version

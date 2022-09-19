@@ -1,0 +1,10 @@
+DerivedDataCache/
+FileOpenOrder/
+Intermediate/
+obj/
+Saved/
+.vs
+*.pdb
+*.sln
+*.vcxproj
+*-Debug.*
