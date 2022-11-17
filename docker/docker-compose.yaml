@@ -7,14 +7,14 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     tty: true
-    volumes:
+    volumes:  # See ./.env for BIND
       - ${P4_BIND_ROOT}/perforce-data:/opt/perforce/perforce-data
       - ${P4_BIND_ROOT}/dbs:/opt/perforce/dbs
       - ${P4_BIND_ROOT}/p4dctl.conf.d:/etc/perforce/p4dctl.conf.d
     env_file:
       - .env
     ports:
-      - "2222:22"
-      - "8080:80"
-      - "443:443"
+      - "8822:22"
+      - "8880:80"
+      - "8443:443"
       - "1666:1666"
